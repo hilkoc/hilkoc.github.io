@@ -1,0 +1,118 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectArt from './ProjectArt.astro';
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { title, tagline, tech, liveUrl, accent, status } = project.data;
+const href = `/projects/${project.id}/`;
+---
+<article class="project card">
+  <a href={href} class="art-link" tabindex="-1" aria-hidden="true">
+    <ProjectArt slug={project.id} accent={accent} />
+  </a>
+  <div class="body">
+    <div class="meta">
+      {liveUrl ? <span class="badge live">Live</span> : <span class="badge">{status}</span>}
+    </div>
+    <h3><a href={href}>{title}</a></h3>
+    <p class="muted">{tagline}</p>
+    <ul class="tech">
+      {tech.slice(0, 4).map((t) => <li>{t}</li>)}
+    </ul>
+    <div class="actions">
+      <a href={href} class="more">Details →</a>
+      {liveUrl && <a href={liveUrl} class="launch">Launch ↗</a>}
+    </div>
+  </div>
+</article>
+
+<style>
+  .project {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s;
+  }
+  .project:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+  }
+  .art-link {
+    display: block;
+    border-bottom: 1px solid var(--border);
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--space-6);
+  }
+  h3 {
+    margin-bottom: var(--space-2);
+  }
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  h3 a:hover {
+    color: var(--accent);
+  }
+  .body p {
+    font-size: 0.97rem;
+  }
+  .meta {
+    margin-bottom: var(--space-2);
+  }
+  .badge {
+    font: 600 0.7rem var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .badge.live {
+    color: #16a34a;
+  }
+  :root[data-theme='dark'] .badge.live {
+    color: #4ade80;
+  }
+  .badge.live::before {
+    content: '';
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    margin-right: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 25%, transparent);
+    vertical-align: 0.05rem;
+  }
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-4);
+  }
+  .tech li {
+    font: 500 0.75rem var(--font-mono);
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+  }
+  .actions {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: auto;
+    font: 600 0.9rem var(--font-sans);
+  }
+  .actions a {
+    text-decoration: none;
+  }
+  .launch {
+    margin-left: auto;
+  }
+</style>

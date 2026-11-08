@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPosts, tagSlug } from '../../data/posts';
+
+const posts = await getPosts();
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+---
+<BaseLayout title="Blog" description="Writing on software, mathematics and the things in between.">
+  <div class="container narrow">
+    <header class="page-head">
+      <p class="eyebrow">Blog</p>
+      <h1>Writing</h1>
+      <p class="lede">On software, mathematics and the things in between. <a href="/rss.xml">Subscribe via RSS</a>.</p>
+      {tags.length > 0 && <p class="tags">{tags.map((t) => <a class="tag" href={`/blog/tags/${tagSlug(t)}/`}>#{t}</a>)}</p>}
+    </header>
+    {posts.length === 0 ? <p class="muted">No posts yet.</p> : posts.map((post) => <PostCard post={post} />)}
+  </div>
+</BaseLayout>
+
+<style>
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+/* Share buttons for one URL. "Share" uses the native share sheet where the browser has
+   one, and copies the link otherwise. The other links need no JavaScript. */
+interface Props {
+  url: string;
+  title: string;
+  text: string;
+}
+const { url, title, text } = Astro.props;
+const u = encodeURIComponent(url);
+const t = encodeURIComponent(`${title}: ${text}`);
+const links = [
+  { label: 'Email', href: `mailto:?subject=${encodeURIComponent(title)}&body=${t}%0A%0A${u}` },
+  { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+  { label: 'Bluesky', href: `https://bsky.app/intent/compose?text=${t}%20${u}` },
+  { label: 'X', href: `https://x.com/intent/post?text=${t}&url=${u}` },
+  { label: 'Mastodon', href: `https://mastodonshare.com/?text=${t}&url=${u}` },
+];
+---
+<div class="share" data-share data-url={url} data-title={title} data-text={text}>
+  <button type="button" class="btn btn-secondary share-main">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"></path></svg>
+    <span class="share-label">Copy link</span>
+  </button>
+  <ul>
+    {links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+  </ul>
+  <span class="share-status muted" role="status" aria-live="polite"></span>
+</div>
+
+<script>
+  for (const box of document.querySelectorAll<HTMLElement>('[data-share]')) {
+    const btn = box.querySelector<HTMLButtonElement>('.share-main')!;
+    const label = box.querySelector<HTMLElement>('.share-label')!;
+    const status = box.querySelector<HTMLElement>('.share-status')!;
+    const data = { url: box.dataset.url!, title: box.dataset.title!, text: box.dataset.text! };
+    const native = typeof navigator.share === 'function';
+    if (native) label.textContent = 'Share';
+    btn.addEventListener('click', async () => {
+      if (native) {
+        try {
+          await navigator.share(data);
+          return;
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') return;
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(data.url);
+        status.textContent = 'Link copied. Thank you for sharing!';
+      } catch {
+        status.textContent = data.url;
+      }
+    });
+  }
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    font-family: var(--font-sans);
+  }
+  svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul a {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  ul a:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .share-status {
+    width: 100%;
+    font-size: 0.88rem;
+  }
+  .share-status:empty {
+    display: none;
+  }
+</style>

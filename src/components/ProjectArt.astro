@@ -1,0 +1,103 @@
+---
+/* Small generative illustration per project, drawn in theme colours, so cards look
+   consistent without screenshots. Unknown slugs get a neutral grid. */
+interface Props {
+  slug: string;
+  accent: string;
+}
+const { slug, accent } = Astro.props;
+
+// Zeno: a logarithmic spiral of shrinking circles (zoom that never ends).
+const spiral = Array.from({ length: 22 }, (_, i) => {
+  const a = i * 0.62;
+  const r = 70 * Math.pow(0.86, i);
+  const d = 78 * Math.pow(0.88, i);
+  return { x: 200 + d * Math.cos(a), y: 110 + d * Math.sin(a), r: r * 0.42 };
+});
+
+// Change the world: a field of dots, a quarter of them lit.
+const dots = Array.from({ length: 96 }, (_, i) => ({
+  x: 40 + (i % 16) * 21.5,
+  y: 45 + Math.floor(i / 16) * 26,
+  on: (i * 37) % 100 < 25,
+}));
+
+// Grappy: a small dataflow graph.
+const nodes = [
+  { x: 70, y: 70 }, { x: 70, y: 150 }, { x: 200, y: 110 }, { x: 330, y: 70 }, { x: 330, y: 150 },
+];
+const edges = [[0, 2], [1, 2], [2, 3], [2, 4]];
+
+// Taganizer: a tag DAG in three layers.
+const layers = [[200], [120, 280], [70, 170, 230, 330]];
+const tagEdges: [number, number, number, number][] = [
+  [200, 45, 120, 110], [200, 45, 280, 110], [120, 110, 70, 175], [120, 110, 170, 175],
+  [280, 110, 230, 175], [280, 110, 330, 175], [120, 110, 230, 175],
+];
+---
+<svg viewBox="0 0 400 220" class="art" aria-hidden="true" style={`--art: ${accent}`}>
+  <defs>
+    <radialGradient id={`g-${slug}`} cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="var(--art)" stop-opacity="0.28"></stop>
+      <stop offset="100%" stop-color="var(--art)" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="220" fill="var(--bg-soft)"></rect>
+  <rect width="400" height="220" fill={`url(#g-${slug})`}></rect>
+  {
+    slug === 'zeno' &&
+      spiral.map((c, i) => (
+        <circle cx={c.x} cy={c.y} r={c.r} fill="none" stroke="var(--art)" stroke-width="1.4" opacity={1 - i * 0.035} />
+      ))
+  }
+  {
+    slug === 'change-the-world' &&
+      dots.map((d) => <circle cx={d.x} cy={d.y} r={d.on ? 6 : 4} fill={d.on ? 'var(--art)' : 'var(--border-strong)'} />)
+  }
+  {
+    slug === 'grappy' && (
+      <g>
+        {edges.map(([a, b]) => (
+          <path
+            d={`M${nodes[a].x + 34} ${nodes[a].y} C ${nodes[a].x + 90} ${nodes[a].y}, ${nodes[b].x - 90} ${nodes[b].y}, ${nodes[b].x - 34} ${nodes[b].y}`}
+            fill="none"
+            stroke="var(--art)"
+            stroke-width="2"
+            opacity="0.8"
+          />
+        ))}
+        {nodes.map((n) => (
+          <g>
+            <rect x={n.x - 34} y={n.y - 18} width="68" height="36" rx="8" fill="var(--surface)" stroke="var(--art)" stroke-width="1.6" />
+            <rect x={n.x - 24} y={n.y - 4} width="34" height="4" rx="2" fill="var(--border-strong)" />
+            <circle cx={n.x + 34} cy={n.y} r="4" fill="var(--art)" />
+            <circle cx={n.x - 34} cy={n.y} r="4" fill="var(--art)" />
+          </g>
+        ))}
+      </g>
+    )
+  }
+  {
+    slug === 'taganizer' && (
+      <g>
+        {tagEdges.map(([x1, y1, x2, y2]) => (
+          <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--art)" stroke-width="1.6" opacity="0.7" />
+        ))}
+        {layers.map((xs, li) =>
+          xs.map((x) => (
+            <rect x={x - 30} y={45 + li * 65 - 13} width="60" height="26" rx="13" fill="var(--surface)" stroke="var(--art)" stroke-width="1.6" />
+          )),
+        )}
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .art {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 400 / 220;
+  }
+</style>

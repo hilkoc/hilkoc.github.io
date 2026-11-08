@@ -1,0 +1,86 @@
+---
+/* Cover art, drawn from the book's first idea: the unit circle, the cubic
+   y² = x³ − x + 1, and the line y = 1 that meets the cubic in three rational points.
+   Fixed colours: a cover is a physical object and looks the same in both themes. */
+import { BOOK } from '../data/book';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const W = 400;
+const H = 600;
+const cx = 175;
+const cy = 400;
+const s = 56;
+const X = (x: number) => cx + x * s;
+const Y = (y: number) => cy - y * s;
+
+// Real branch of y² = x³ − x + 1 starts at the real root of x³ − x + 1 = 0.
+let r = -1.3;
+for (let i = 0; i < 40; i++) r -= (r ** 3 - r + 1) / (3 * r * r - 1);
+const xs: number[] = [];
+for (let i = 0; i <= 160; i++) {
+  const t = i / 160;
+  xs.push(r + (2.0 - r) * t * t); // denser samples near the vertical tangent at x = r
+}
+const upper = xs.map((x) => [X(x), Y(Math.sqrt(Math.max(0, x ** 3 - x + 1)))]);
+const lower = xs.map((x) => [X(x), Y(-Math.sqrt(Math.max(0, x ** 3 - x + 1)))]);
+const pts = [...upper.reverse(), ...lower];
+const cubic = 'M' + pts.map(([a, b]) => `${a.toFixed(1)} ${b.toFixed(1)}`).join(' L');
+
+// Secant of the circle through (−1, 0) with slope 1/2 meets it again at (3/5, 4/5).
+const circlePts = [[-1, 0], [0.6, 0.8]];
+const cubicPts = [[-1, 1], [0, 1], [1, 1]];
+---
+<svg viewBox={`0 0 ${W} ${H}`} class:list={['cover', className]} role="img" aria-label={`Cover of ${BOOK.title}: ${BOOK.subtitle}`}>
+  <defs>
+    <linearGradient id="cover-bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#2a2575"></stop>
+      <stop offset="0.55" stop-color="#1b1850"></stop>
+      <stop offset="1" stop-color="#0f0d2e"></stop>
+    </linearGradient>
+    <radialGradient id="cover-glow" cx="0.45" cy="0.68" r="0.5">
+      <stop offset="0" stop-color="#818cf8" stop-opacity="0.35"></stop>
+      <stop offset="1" stop-color="#818cf8" stop-opacity="0"></stop>
+    </radialGradient>
+    <clipPath id="cover-clip"><rect width={W} height={H} rx="6"></rect></clipPath>
+  </defs>
+  <g clip-path="url(#cover-clip)">
+    <rect width={W} height={H} fill="url(#cover-bg)"></rect>
+    <rect width={W} height={H} fill="url(#cover-glow)"></rect>
+    <rect x="0" y="0" width="14" height={H} fill="#000" opacity="0.18"></rect>
+
+    <g fill="none" stroke-linecap="round">
+      <line x1="20" y1={Y(0)} x2={W - 20} y2={Y(0)} stroke="#c7d2fe" stroke-opacity="0.18"></line>
+      <line x1={X(0)} y1="250" x2={X(0)} y2={H - 20} stroke="#c7d2fe" stroke-opacity="0.18"></line>
+      <circle cx={X(0)} cy={Y(0)} r={s} stroke="#c7d2fe" stroke-opacity="0.75" stroke-width="2"></circle>
+      <line x1={X(-1.6)} y1={Y(-0.3)} x2={X(1.6)} y2={Y(1.3)} stroke="#c7d2fe" stroke-opacity="0.5" stroke-width="1.3"></line>
+      <path d={cubic} stroke="#a5b4fc" stroke-width="3"></path>
+      <line x1={X(-2.4)} y1={Y(1)} x2={X(3.6)} y2={Y(1)} stroke="#f0b27a" stroke-opacity="0.8" stroke-width="1.5"></line>
+    </g>
+    {circlePts.map(([a, b]) => <circle cx={X(a)} cy={Y(b)} r="5" fill="#e0e7ff" />)}
+    {cubicPts.map(([a, b]) => <circle cx={X(a)} cy={Y(b)} r="5.5" fill="#f0b27a" />)}
+
+    <text x="40" y="78" fill="#c7d2fe" font-family="Inter Variable, sans-serif" font-size="12" font-weight="600" letter-spacing="2.2">ALGEBRAIC CURVES THROUGH PROBLEMS</text>
+    <text font-family="Fraunces Variable, Georgia, serif" font-weight="600" fill="#f5f3ff" font-size="40" letter-spacing="-0.6">
+      <tspan x="38" y="150">From Pythagoras</tspan>
+      <tspan x="38" y="196">to Riemann–Roch</tspan>
+    </text>
+    <text x="40" y={H - 40} fill="#e0e7ff" font-family="Inter Variable, sans-serif" font-size="16" font-weight="500" letter-spacing="2">{BOOK.author.toUpperCase()}</text>
+  </g>
+</svg>
+
+<style>
+  .cover {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 30px 60px -20px rgba(15, 13, 46, 0.55),
+      0 18px 36px -18px rgba(79, 70, 229, 0.45);
+  }
+</style>

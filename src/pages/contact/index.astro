@@ -1,0 +1,202 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { SITE, WEB3FORMS_KEY, WEB3FORMS_URL } from '../../data/site';
+const thanks = new URL('/contact/thanks/', SITE.url).href;
+---
+<BaseLayout title="Contact" description="Send Hilko a message: questions, feedback on the book or projects, or just hello.">
+  <div class="container narrow">
+    <header class="page-head">
+      <p class="eyebrow">Contact</p>
+      <h1>Say hello</h1>
+      <p class="lede">
+        A question about the book, a bug in a project, an idea, or just hello. I read every
+        message. Leave an email address if you would like a reply.
+      </p>
+    </header>
+
+    <form class="form card" action={WEB3FORMS_URL} method="POST" data-contact novalidate>
+      <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+      <input type="hidden" name="subject" value="hilkoc.github.io: contact" />
+      <input type="hidden" name="from_name" value="hilkoc.github.io" />
+      <input type="hidden" name="redirect" value={thanks} />
+
+      <div class="row">
+        <div class="field">
+          <label for="f-name">Name <span class="opt">optional</span></label>
+          <input id="f-name" name="name" type="text" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="f-email">Email <span class="opt">optional, for a reply</span></label>
+          <input id="f-email" name="email" type="email" autocomplete="email" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-topic">Topic</label>
+        <select id="f-topic" name="topic">
+          <option>General</option>
+          <option>The book</option>
+          <option>A project</option>
+          <option>Notify me when the book is out</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-message">Message</label>
+        <textarea id="f-message" name="message" rows="7" required></textarea>
+      </div>
+
+      <!-- Honeypot: bots fill it in, people never see it. -->
+      <div class="hp" aria-hidden="true">
+        <label for="f-botcheck">Leave this empty</label>
+        <input id="f-botcheck" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">Send message</button>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+
+    <p class="privacy muted">
+      Your message goes to <a href="https://web3forms.com">Web3Forms</a>, which forwards it to my
+      inbox. Only what you type is sent, plus this page's address and the page you came from. Nothing is stored on this
+      site.
+    </p>
+  </div>
+</BaseLayout>
+
+<script>
+  /* Posted with fetch, so the reader stays on the page and sees the thanks line.
+     Without JavaScript the form still works: Web3Forms redirects to /contact/thanks/. */
+  const form = document.querySelector<HTMLFormElement>('[data-contact]');
+  if (form) {
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const status = form.querySelector<HTMLElement>('.status')!;
+    const message = form.querySelector<HTMLTextAreaElement>('#f-message')!;
+    const topic = new URLSearchParams(location.search).get('topic');
+    if (topic === 'book') form.querySelector<HTMLSelectElement>('#f-topic')!.value = 'The book';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.className = 'status';
+      if (!message.value.trim()) {
+        status.textContent = 'Please write a message first.';
+        message.focus();
+        return;
+      }
+      const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+      delete data.redirect;
+      data.name = data.name?.trim() || 'anonymous';
+      // The page the form was sent from, plus the page the reader came from (if any).
+      // Kept as two labelled fields: the referrer alone looked like the sending page.
+      data['Sent from'] = location.href;
+      if (document.referrer && document.referrer !== location.href) data['Came from'] = document.referrer;
+      data.subject = `hilkoc.github.io: ${data.topic}`;
+      if (data.email) data.replyto = data.email;
+      else delete data.email;
+
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!json?.success) throw new Error('rejected');
+        form.reset();
+        status.className = 'status ok';
+        status.textContent = 'Thank you. Your message is on its way.';
+        btn.textContent = 'Sent';
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+        status.className = 'status err';
+        status.textContent = 'Sorry, the message could not be sent. Please try again in a minute.';
+      }
+    });
+  }
+</script>
+
+<style>
+  .form {
+    display: grid;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    font-family: var(--font-sans);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-6);
+  }
+  .field {
+    display: grid;
+    gap: var(--space-2);
+  }
+  label {
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  .opt {
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+  input,
+  select,
+  textarea {
+    width: 100%;
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.7rem 0.85rem;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 9rem;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .status {
+    margin: 0;
+    color: var(--text-muted);
+  }
+  .status.ok {
+    color: #16a34a;
+  }
+  :root[data-theme='dark'] .status.ok {
+    color: #4ade80;
+  }
+  .status.err {
+    color: #dc2626;
+  }
+  :root[data-theme='dark'] .status.err {
+    color: #f87171;
+  }
+  .privacy {
+    margin-top: var(--space-6);
+    font: 0.88rem var(--font-sans);
+  }
+</style>

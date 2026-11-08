@@ -1,0 +1,61 @@
+---
+import { SITE } from '../data/site';
+import ViewCount from './ViewCount.astro';
+interface Props {
+  showViews?: boolean;
+}
+const { showViews = true } = Astro.props;
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container inner">
+    <p class="copy">© {year} {SITE.author}. Built with Astro, hosted on GitHub Pages.</p>
+    <ul class="links">
+      <li><a href={SITE.github}>GitHub</a></li>
+      <li><a href="/rss.xml">RSS</a></li>
+      <li><a href="/contact/">Contact</a></li>
+      <li><a href={SITE.donate}>Buy me a coffee</a></li>
+    </ul>
+    {showViews && <ViewCount class="footer-views" />}
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-24);
+    border-top: 1px solid var(--border);
+    background: var(--bg-soft);
+    font: 0.9rem var(--font-sans);
+    color: var(--text-muted);
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-8);
+    padding-block: var(--space-8);
+  }
+  .copy {
+    margin: 0;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0 0 0 auto;
+    padding: 0;
+  }
+  a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--accent);
+  }
+  :global(.footer-views) {
+    width: 100%;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+</style>

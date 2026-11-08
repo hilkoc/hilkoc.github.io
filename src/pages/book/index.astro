@@ -1,0 +1,666 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BookCover from '../../components/BookCover.astro';
+import ShareLinks from '../../components/ShareLinks.astro';
+import { BACK, BOOK, CHAPTER_COUNT, FRONT, PARTS, chapterUrl, latestRelease } from '../../data/book';
+import { SITE } from '../../data/site';
+
+const release = await latestRelease();
+const live = BOOK.published;
+const releaseLine = release
+  ? `Latest edition ${release.tag}, ${new Date(release.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.`
+  : live
+    ? 'Always the latest edition.'
+    : 'The book is in its final edit. Downloads open here soon.';
+
+const link = (slug: string) => (live ? chapterUrl(slug) : undefined);
+
+const values = [
+  {
+    title: 'Every chapter starts with a problem',
+    text: 'A concrete question you could explain to a good undergraduate. The rest of the chapter solves it, and the theory arrives because the solution needs it.',
+  },
+  {
+    title: 'Ideas in the order they make sense',
+    text: 'Projective space, function fields, sheaves and cohomology each enter at the moment they become the natural tool, not twenty pages before you know why.',
+  },
+  {
+    title: 'Signposts to the standard texts',
+    text: '“Look up” boxes point to the exact section of Hartshorne, Fulton, Vakil, Stichtenoth or Silverman. Read the reference at once, or trust the box and keep going.',
+  },
+  {
+    title: 'One route, start to finish',
+    text: `From Pythagorean triples to the Riemann–Roch theorem and codes from curves, in ${CHAPTER_COUNT} chapters that build on each other. No gaps to bridge yourself.`,
+  },
+];
+
+const outcomes = [
+  'what schemes and sheaves are for;',
+  'what an algebraic curve is, and how to tell when two curves are different;',
+  'why smooth projective curves and function fields are two descriptions of one thing;',
+  'what tangent spaces and differentials do;',
+  'how to compute the genus of a curve;',
+  'how to use the Riemann–Roch theorem in practice.',
+];
+
+const faq = [
+  {
+    q: 'What do I need to know first?',
+    a: 'Comfort with undergraduate algebra: rings, ideals, fields and polynomials. A first course in commutative algebra helps. Atiyah–Macdonald is the reference the book uses.',
+  },
+  {
+    q: 'Does it replace a textbook?',
+    a: 'No, and it does not try to. It is a companion. It tells you why each definition exists and where the standard text states and proves it. Keep Hartshorne or Fulton open beside it.',
+  },
+  {
+    q: 'Which format should I pick?',
+    a: 'The PDF is typeset for print at 6×9 inches and is the most faithful. The EPUB uses MathML and reads well in Apple Books, Kobo and Thorium; Kindle handles mathematics poorly. The online edition works on any device.',
+  },
+  {
+    q: 'Will the book be updated?',
+    a: 'Yes. Corrections and improvements are published as new editions. The download links on this page always point to the latest one.',
+  },
+  {
+    q: 'Do I have to pay before reading?',
+    a: `No. Read as much as you like first, the way you try on clothes before you buy them. The book is not free, though. When it fits, pay what you think it is worth; a fair price is €1 per chapter, €${BOOK.suggestedEuro} for all ${CHAPTER_COUNT}. If you cannot pay now, come back later, or share the book with someone who will enjoy it. ${BOOK.rights}`,
+  },
+];
+---
+<BaseLayout
+  image="/og-book.png"
+  title={`${BOOK.title}: ${BOOK.subtitle}`}
+  description={`A problem-first companion to algebraic geometry. ${CHAPTER_COUNT} chapters from Pythagorean triples to Riemann–Roch, in the order the ideas make sense. Read it first, then pay what it is worth.`}
+>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <p class="eyebrow">The book</p>
+        <h1>{BOOK.title}</h1>
+        <p class="subtitle">{BOOK.subtitle}</p>
+        <p class="lede">
+          Learn algebraic geometry in the order it makes sense. One concrete problem per chapter,
+          and exactly the theory you need to solve it.
+        </p>
+        <div class="btn-row">
+          <a class="btn btn-primary" href={live ? BOOK.html : '#downloads'}>{live ? 'Start reading' : 'Get the book'}</a>
+          <a class="btn btn-secondary" href="#support">Pay what it's worth</a>
+        </div>
+        <p class="facts muted">{CHAPTER_COUNT} chapters · 5 parts · PDF, EPUB and web · Try before you pay</p>
+      </div>
+      <div class="hero-cover">
+        <BookCover />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow">Why this book</p>
+      <h2>Most people learn this subject twice</h2>
+      <div class="prose">
+        <p>
+          The great textbooks present algebraic geometry in the order of logic: definitions, then
+          theorems, then proofs. You meet the structure sheaf before any problem it solves, and
+          cohomology before any question it answers. You can follow every line and still not know
+          why anyone would define things this way.
+        </p>
+        <p>
+          So the second education happens later, piece by piece. You hunt through lecture notes,
+          papers, forum threads and long conversations with an AI. Each source explains one idea
+          in its own notation, at its own level, with its own gaps. Putting them in order and
+          checking that they fit is the expensive part.
+        </p>
+        <p class="pull">
+          This book puts the second education first. It hands you what you would otherwise
+          spend weeks collecting: the motivation, in a logical order, clearly explained, and
+          connected from the first page to the last.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">What you get</p>
+          <h2>A companion that explains the why</h2>
+        </div>
+      </div>
+      <div class="values">
+        {
+          values.map((v, i) => (
+            <div class="value card">
+              <span class="num">0{i + 1}</span>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow">The problems are not decoration</p>
+      <h2>Each idea arrives because a problem demands it</h2>
+      <ul class="demands">
+        <li><strong>Projective space</strong> arrives because two circles should meet in four points, and visibly don't.</li>
+        <li><strong>Function fields</strong> arrive because four curves that look different share something no equation shows.</li>
+        <li><strong>Sheaf cohomology</strong> arrives because partial fractions fail on a cubic curve, and the failure has a size.</li>
+      </ul>
+      <p class="muted">
+        One number ties it all together. The genus is the number of holes in a surface. It is also
+        the dimension of a space of differentials, the size of the obstruction to partial
+        fractions, and the correction term in a formula that counts functions. The real subject of
+        the book is why these are the same number.
+      </p>
+    </div>
+  </section>
+
+  <section class="section alt" id="contents">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">The route</p>
+          <h2>Contents</h2>
+        </div>
+        {live && <a href={BOOK.html}>Read online →</a>}
+      </div>
+      <div class="route">
+        <a class="front" href={link(FRONT.slug)}>{FRONT.title}</a>
+        {
+          PARTS.map((part) => (
+            <section class="part">
+              <header>
+                <p class="part-name">{part.name}</p>
+                <h3>{part.title}</h3>
+                <p class="muted">{part.summary}</p>
+              </header>
+              <ol>
+                {part.chapters.map((c) => (
+                  <li>
+                    <span class="cn">{c.n}</span>
+                    <span>
+                      <a href={link(c.slug)}>{c.title}</a>
+                      {c.problem && <span class="problem">{c.problem}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+        <a class="front" href={link(BACK.slug)}>{BACK.title}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <p class="eyebrow">By the end</p>
+        <h2>You will know</h2>
+        <ul class="checks">{outcomes.map((o) => <li>{o}</li>)}</ul>
+      </div>
+      <div>
+        <p class="eyebrow">Who it is for</p>
+        <h2>Written for you if</h2>
+        <ul class="checks">
+          <li>you are a graduate student meeting Hartshorne for the first time;</li>
+          <li>you learnt the formal version and want to see what it is <em>for</em>;</li>
+          <li>you work near the subject, in number theory, coding theory or physics, and need the curve case clearly;</li>
+          <li>you prefer one coherent path over a pile of tabs and prompts.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="support">
+    <div class="container">
+      <div class="donate card">
+        <div>
+          <p class="eyebrow">Try it on, then pay what it's worth</p>
+          <h2>Read first. Pay when it fits.</h2>
+          <p>
+            You try on clothes before you buy them. Do the same here: every chapter is open to you,
+            so you can see whether the book fits before you pay. When it does, pay what you think
+            it is worth. A fair price is <strong>€1 per chapter</strong>.
+          </p>
+          <p class="muted small">Payments go through Buy Me a Coffee. No account needed.</p>
+        </div>
+        <div class="donate-cta">
+          <p class="price"><span class="amount">€{BOOK.suggestedEuro}</span><span class="muted">suggested · {CHAPTER_COUNT} chapters × €1</span></p>
+          <a class="btn btn-primary big" href={SITE.donate} target="_blank" rel="noopener">☕ Pay on Buy Me a Coffee</a>
+        </div>
+      </div>
+
+      <div class="later">
+        <div class="later-card card">
+          <h3>Not ready to pay yet?</h3>
+          <p class="muted">
+            Read a few chapters first, then come back to this page. Bookmark it now
+            (<kbd>Ctrl</kbd>+<kbd>D</kbd>, or <kbd>⌘</kbd>+<kbd>D</kbd> on a Mac) so you can find
+            it again.
+          </p>
+          <a class="small" href="#downloads">Go to the downloads →</a>
+        </div>
+        <div class="later-card card">
+          <h3>Not paying at this time?</h3>
+          <p class="muted">
+            Then the least you can do is share the book with someone who will enjoy it. It costs
+            nothing and helps more than you think.
+          </p>
+          <ShareLinks url={BOOK.url} title={BOOK.title} text="a problem-first companion to algebraic geometry. Try it before you pay." />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="downloads">
+    <div class="container narrow">
+      <p class="eyebrow">Get the book</p>
+      <h2>Downloads</h2>
+      <p class="muted">{releaseLine}</p>
+      <div class="formats">
+        <a class="format card" href={live ? BOOK.pdf : undefined} aria-disabled={live ? undefined : 'true'}>
+          <span class="fmt">PDF</span>
+          <span><strong>Print edition</strong><span class="muted">6×9 in, typeset with XeLaTeX. Best for reading and printing.</span></span>
+        </a>
+        <a class="format card" href={live ? BOOK.epub : undefined} aria-disabled={live ? undefined : 'true'}>
+          <span class="fmt">EPUB</span>
+          <span><strong>E-reader edition</strong><span class="muted">EPUB 3 with MathML. Apple Books, Kobo, Thorium. Not ideal on Kindle.</span></span>
+        </a>
+        <a class="format card" href={live ? BOOK.html : undefined} aria-disabled={live ? undefined : 'true'}>
+          <span class="fmt">WEB</span>
+          <span><strong>Online edition</strong><span class="muted">One page per chapter, on any device. Nothing to install.</span></span>
+        </a>
+      </div>
+      <p class="reminder">
+        Enjoying it? <a href="#support">Come back and pay what it's worth</a>, or share it with a
+        friend.
+      </p>
+      {
+        !live && (
+          <p class="soon">
+            Coming soon. Follow the <a href="/rss.xml">blog feed</a> for the announcement, or{' '}
+            <a href="/contact/?topic=book">ask to be notified</a>.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow">Questions</p>
+      <h2>FAQ</h2>
+      <div class="faq">
+        {
+          faq.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p class="muted">{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+      <p class="muted">Another question, or found a mistake? <a href="/contact/?topic=book">Ask about the book</a>.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: var(--space-16) var(--space-12);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: -20% -10% auto auto;
+    width: 60rem;
+    height: 60rem;
+    background: radial-gradient(closest-side, var(--glow), transparent);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+  .hero h1 {
+    margin-bottom: var(--space-2);
+  }
+  .subtitle {
+    font: italic 400 1.5rem var(--font-heading);
+    color: var(--text-muted);
+    margin-bottom: var(--space-6);
+  }
+  .hero .btn-row {
+    margin-top: var(--space-8);
+  }
+  .facts {
+    margin-top: var(--space-6);
+    font: 0.9rem var(--font-sans);
+  }
+  .hero-cover {
+    max-width: 22rem;
+    justify-self: center;
+    transform: rotate(2deg);
+    transition: transform 0.4s var(--ease);
+  }
+  .hero-cover:hover {
+    transform: rotate(0) translateY(-4px);
+  }
+  @media (max-width: 52rem) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-cover {
+      max-width: 15rem;
+      grid-row: 1;
+    }
+  }
+
+  .alt {
+    background: var(--bg-soft);
+    border-block: 1px solid var(--border);
+  }
+  .pull {
+    font: 500 1.3rem/1.5 var(--font-heading);
+    color: var(--text);
+    border-left: 3px solid var(--accent);
+    padding-left: var(--space-6);
+  }
+
+  .values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-6);
+  }
+  .value {
+    padding: var(--space-6);
+  }
+  .value p {
+    margin: 0;
+    font-size: 0.97rem;
+  }
+  .num {
+    display: block;
+    font: 600 0.85rem var(--font-mono);
+    color: var(--accent);
+    margin-bottom: var(--space-4);
+  }
+
+  .demands {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-8) 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+  .demands li {
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius);
+    background: var(--accent-soft);
+    font-size: 1.05rem;
+  }
+
+  .route {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .front {
+    font: italic 500 1.05rem var(--font-heading);
+    padding: var(--space-2) 0;
+    color: var(--text-muted);
+  }
+  .part {
+    display: grid;
+    grid-template-columns: minmax(14rem, 1fr) 2fr;
+    gap: var(--space-8);
+    padding: var(--space-8);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .part-name {
+    font: 600 0.75rem var(--font-sans);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: var(--space-2);
+  }
+  .part h3 {
+    margin-bottom: var(--space-2);
+  }
+  .part header p.muted {
+    font-size: 0.93rem;
+    margin: 0;
+  }
+  .part ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .part li {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    align-items: baseline;
+  }
+  .cn {
+    font: 600 0.85rem var(--font-mono);
+    color: var(--text-muted);
+  }
+  .part li a {
+    color: var(--text);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .part li a[href]:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+  .problem {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  @media (max-width: 48rem) {
+    .part {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+      padding: var(--space-6);
+    }
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-12);
+  }
+  .checks {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .checks li {
+    position: relative;
+    padding-left: 1.9rem;
+  }
+  .checks li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    display: grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font: 700 0.75rem var(--font-sans);
+  }
+
+  .donate {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    padding: var(--space-12);
+    border-radius: var(--radius-lg);
+    border-color: var(--accent);
+    background:
+      radial-gradient(circle at 100% 0%, var(--glow), transparent 60%),
+      var(--surface);
+  }
+  .donate-cta {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+  .price {
+    display: grid;
+    margin: 0;
+    font-family: var(--font-sans);
+  }
+  .amount {
+    font: 600 3.5rem/1 var(--font-heading);
+    color: var(--accent);
+  }
+  .price .muted {
+    font-size: 0.85rem;
+    margin-top: var(--space-2);
+  }
+  .big {
+    min-height: 3.4rem;
+    padding-inline: 1.8rem;
+    font-size: 1.05rem;
+  }
+  .small {
+    font-size: 0.88rem;
+  }
+  @media (max-width: 52rem) {
+    .donate {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+      padding: var(--space-8);
+    }
+  }
+
+  .later {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+  .later-card {
+    padding: var(--space-8);
+  }
+  .later-card h3 {
+    margin-bottom: var(--space-3);
+  }
+  kbd {
+    font: 0.8em var(--font-mono);
+    padding: 0.05em 0.35em;
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+  }
+  .reminder {
+    font-size: 1rem;
+  }
+
+  .formats {
+    display: grid;
+    gap: var(--space-4);
+    margin-block: var(--space-6);
+  }
+  .format {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s var(--ease);
+  }
+  .format[href]:hover {
+    border-color: var(--accent);
+    transform: translateX(3px);
+  }
+  .format[aria-disabled='true'] {
+    opacity: 0.6;
+  }
+  .format > span:last-child {
+    display: grid;
+  }
+  .format .muted {
+    font-size: 0.9rem;
+  }
+  .fmt {
+    display: grid;
+    place-items: center;
+    height: 3rem;
+    border-radius: var(--radius-sm);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    font: 700 0.8rem var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+  .soon {
+    padding: var(--space-4) var(--space-6);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+  }
+
+  .faq {
+    display: grid;
+    gap: var(--space-2);
+    margin-block: var(--space-6);
+  }
+  details {
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-4) 0;
+  }
+  summary {
+    cursor: pointer;
+    font: 600 1.05rem var(--font-sans);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    color: var(--accent);
+    font-size: 1.3rem;
+    line-height: 1;
+    transition: transform 0.2s;
+  }
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+  details p {
+    margin: var(--space-3) 0 0;
+  }
+</style>

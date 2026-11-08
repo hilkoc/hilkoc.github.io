@@ -1,0 +1,131 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ClickToLoadIframe from '../../components/ClickToLoadIframe.astro';
+import PhoneFrame from '../../components/PhoneFrame.astro';
+import ProjectArt from '../../components/ProjectArt.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+}
+
+const { project, next } = Astro.props;
+const { title, tagline, repo, liveUrl, tech, embed, accent, install } = project.data;
+const { Content } = await render(project);
+---
+<BaseLayout title={title} description={tagline}>
+  <div class="container">
+    <header class="page-head head">
+      <p class="eyebrow"><a href="/projects/">Projects</a> / {title}</p>
+      <h1>{title}</h1>
+      <p class="lede">{tagline}</p>
+      <div class="btn-row">
+        {liveUrl && <a class="btn btn-primary" href={liveUrl}>Launch {title} ↗</a>}
+        <a class="btn btn-secondary" href={repo}>Source on GitHub</a>
+      </div>
+      <ul class="tech">{tech.map((t) => <li>{t}</li>)}</ul>
+    </header>
+  </div>
+
+  <div class="container stage">
+    {
+      embed === 'iframe' && liveUrl && (
+        <ClickToLoadIframe src={liveUrl} title={`${title} live demo`} cta="Start the live explorer">
+          <ProjectArt slug={project.id} accent={accent} />
+        </ClickToLoadIframe>
+      )
+    }
+    {embed === 'phone' && liveUrl && <PhoneFrame src={liveUrl} title={title} />}
+    {
+      embed === 'none' && (
+        <div class="art card">
+          <ProjectArt slug={project.id} accent={accent} />
+        </div>
+      )
+    }
+  </div>
+
+  <div class="container narrow">
+    {
+      install && (
+        <div class="install card">
+          <span class="muted">Install</span>
+          <code>{install}</code>
+        </div>
+      )
+    }
+    <article class="prose">
+      <Content />
+    </article>
+
+    <nav class="next card" aria-label="Next project">
+      <span class="muted">Next project</span>
+      <a href={`/projects/${next.id}/`}>{next.data.title} →</a>
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .head .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .head .btn-row {
+    margin-top: var(--space-6);
+  }
+  .tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 0;
+  }
+  .tech li {
+    font: 500 0.78rem var(--font-mono);
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+  }
+  .stage {
+    margin-bottom: var(--space-12);
+  }
+  .art {
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .install {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-8);
+    font-family: var(--font-sans);
+  }
+  .install code {
+    font: 0.95rem var(--font-mono);
+  }
+  .next {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-16);
+    padding: var(--space-6);
+    font-family: var(--font-sans);
+  }
+  .next a {
+    font-weight: 600;
+    text-decoration: none;
+  }
+</style>

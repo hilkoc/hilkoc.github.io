@@ -1,0 +1,86 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/fraunces';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import '../styles/prose.css';
+import { GOAT_CODE, SITE } from '../data/site';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PresetSwitcher from '../components/PresetSwitcher.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  showViews?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  image = '/og.png',
+  type = 'website',
+  showViews = true,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — notes, projects and a book`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+const dev = import.meta.env.DEV;
+---
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.title} — blog`} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f7f1e3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0c14" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title ?? SITE.title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Runs before first paint, so the page never flashes the wrong theme. -->
+    <script is:inline>
+      (function () {
+        var t = localStorage.getItem('theme');
+        var dark = t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
+    {
+      dev && (
+        <script
+          is:inline
+          set:html={`(function(){var p=localStorage.getItem('preset');if(p&&p!=='night')document.documentElement.dataset.preset=p;})();`}
+        />
+      )
+    }
+
+    <!-- GoatCounter: privacy-friendly, no cookies. Skips localhost by default. -->
+    <script is:inline data-goatcounter={`https://${GOAT_CODE}.goatcounter.com/count`} async src="https://gc.zgo.at/count.js"></script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer showViews={showViews} />
+    {dev && <PresetSwitcher />}
+  </body>
+</html>

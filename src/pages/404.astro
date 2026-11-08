@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Page not found" showViews={false}>
+  <div class="container narrow">
+    <header class="page-head">
+      <p class="eyebrow">404</p>
+      <h1>This point is not on the curve</h1>
+      <p class="lede">The page you are looking for does not exist, or it moved.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/">Go home</a>
+        <a class="btn btn-secondary" href="/blog/">Read the blog</a>
+      </div>
+    </header>
+  </div>
+</BaseLayout>

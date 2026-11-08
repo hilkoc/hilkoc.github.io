@@ -1,0 +1,153 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BookCover from '../components/BookCover.astro';
+import PostCard from '../components/PostCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { BOOK, CHAPTER_COUNT } from '../data/book';
+import { getPosts } from '../data/posts';
+import { SITE } from '../data/site';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const posts = (await getPosts()).slice(0, 3);
+---
+<BaseLayout>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Hello, I'm {SITE.author}</p>
+      <h1>I build software, write mathematics, and try to <span class="hl">change the world</span> a little.</h1>
+      <p class="lede">
+        This is where my projects, notes and a book on algebraic curves live. Everything here is
+        open, and most of it runs in your browser.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/book/">Read the book</a>
+        <a class="btn btn-secondary" href="/projects/">See the projects</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section book-feature">
+    <div class="container">
+      <a href="/book/" class="feature card">
+        <div class="cover"><BookCover /></div>
+        <div>
+          <p class="eyebrow">New book · try before you pay</p>
+          <h2>{BOOK.title}</h2>
+          <p class="sub">{BOOK.subtitle}</p>
+          <p class="muted">
+            A problem-first companion to algebraic geometry. {CHAPTER_COUNT} chapters, from
+            Pythagorean triples to the Riemann–Roch theorem, in the order the ideas make sense.
+          </p>
+          <span class="go">Discover the book →</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Projects</p>
+          <h2>Things I build</h2>
+        </div>
+        <a href="/projects/">All projects →</a>
+      </div>
+      <div class="grid">{projects.map((p) => <ProjectCard project={p} />)}</div>
+    </div>
+  </section>
+
+  {
+    posts.length > 0 && (
+      <section class="section">
+        <div class="container narrow">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Blog</p>
+              <h2>Latest writing</h2>
+            </div>
+            <a href="/blog/">All posts →</a>
+          </div>
+          {posts.map((post) => <PostCard post={post} />)}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: var(--space-24) var(--space-12);
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -30rem;
+    left: 50%;
+    width: 80rem;
+    height: 60rem;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, var(--glow), transparent);
+    pointer-events: none;
+  }
+  .hero .container {
+    position: relative;
+  }
+  .hero h1 {
+    max-width: 20ch;
+  }
+  .hl {
+    background: linear-gradient(100deg, var(--accent), var(--highlight));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero .btn-row {
+    margin-top: var(--space-8);
+  }
+  .feature {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    padding: var(--space-12);
+    border-radius: var(--radius-lg);
+    color: var(--text);
+    text-decoration: none;
+    background:
+      radial-gradient(circle at 0% 100%, var(--glow), transparent 55%),
+      var(--surface);
+    transition: border-color 0.25s, transform 0.25s var(--ease);
+  }
+  .feature:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+  .cover {
+    transform: rotate(-3deg);
+  }
+  .feature h2 {
+    margin-bottom: var(--space-1);
+  }
+  .sub {
+    font: italic 1.2rem var(--font-heading);
+    color: var(--text-muted);
+  }
+  .go {
+    font: 600 1rem var(--font-sans);
+    color: var(--accent);
+  }
+  @media (max-width: 44rem) {
+    .feature {
+      grid-template-columns: 1fr;
+      padding: var(--space-8);
+      gap: var(--space-8);
+    }
+    .cover {
+      max-width: 10rem;
+    }
+  }
+</style>

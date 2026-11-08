@@ -1,0 +1,79 @@
+---
+/* Dev-only panel to compare design presets. BaseLayout renders it only when
+   import.meta.env.DEV is true, so it never reaches the production build. */
+const presets = [
+  { id: 'night', name: 'Paper & Night' },
+  { id: 'paper', name: 'Paper & Ink' },
+  { id: 'indigo', name: 'Indigo Night' },
+  { id: 'mono', name: 'Minimal Mono' },
+];
+---
+<div class="preset-switcher" role="group" aria-label="Design preset (dev only)">
+  <span class="ps-title">Preset · dev</span>
+  {presets.map((p) => <button type="button" data-preset-btn={p.id}>{p.name}</button>)}
+</div>
+
+<script is:inline>
+  (function () {
+    var root = document.documentElement;
+    function mark() {
+      var cur = root.dataset.preset || 'night';
+      document.querySelectorAll('[data-preset-btn]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-preset-btn') === cur));
+      });
+    }
+    document.querySelectorAll('[data-preset-btn]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-preset-btn');
+        if (id === 'night') {
+          delete root.dataset.preset;
+          localStorage.removeItem('preset');
+        } else {
+          root.dataset.preset = id;
+          localStorage.setItem('preset', id);
+        }
+        mark();
+      });
+    });
+    mark();
+  })();
+</script>
+
+<style>
+  .preset-switcher {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.6rem;
+    background: var(--surface);
+    border: 1px dashed var(--accent);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    font: 500 0.78rem var(--font-sans);
+  }
+  .ps-title {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+  }
+  button {
+    font: inherit;
+    text-align: left;
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  button[aria-pressed='true'] {
+    background: var(--accent);
+    color: var(--accent-contrast);
+    border-color: var(--accent);
+  }
+</style>

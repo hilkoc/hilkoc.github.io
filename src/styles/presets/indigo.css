@@ -1,0 +1,48 @@
+/* Indigo Night: Inter body, Fraunces headings, rounded corners. Warm paper in light
+   mode, deep indigo in dark mode. Applies when <html data-preset="indigo">. */
+:root[data-preset='indigo'] {
+  --font-body: var(--font-sans);
+  --heading-weight: 600;
+  --heading-tracking: -0.015em;
+  --radius-sm: 0.4rem;
+  --radius: 0.75rem;
+  --radius-lg: 1.25rem;
+}
+
+:root[data-preset='indigo'][data-theme='light'] {
+  --bg: #fbfaf7;
+  --bg-soft: #f3f1ea;
+  --surface: #ffffff;
+  --border: #e4e1d8;
+  --border-strong: #cfcabd;
+  --text: #1c1b2e;
+  --text-muted: #565470;
+  --accent: #4f46e5;
+  --accent-strong: #4338ca;
+  --accent-soft: #eef0ff;
+  --accent-contrast: #ffffff;
+  --highlight: #7c3aed;
+  --glow: rgba(99, 102, 241, 0.14);
+  --shadow: 0 1px 2px rgba(28, 27, 46, 0.05), 0 8px 24px -12px rgba(28, 27, 46, 0.18);
+  --header-bg: rgba(251, 250, 247, 0.78);
+  --grain-opacity: 0.035;
+}
+
+:root[data-preset='indigo'][data-theme='dark'] {
+  --bg: #0f0d2e;
+  --bg-soft: #141139;
+  --surface: #1a1745;
+  --border: #2e2a6b;
+  --border-strong: #423d8c;
+  --text: #e6e4ff;
+  --text-muted: #a9a6d6;
+  --accent: #818cf8;
+  --accent-strong: #a5b4fc;
+  --accent-soft: #24205e;
+  --accent-contrast: #0f0d2e;
+  --highlight: #a78bfa;
+  --glow: rgba(129, 140, 248, 0.22);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+  --header-bg: rgba(15, 13, 46, 0.72);
+  --grain-opacity: 0;
+}

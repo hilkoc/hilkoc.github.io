@@ -1,0 +1,19 @@
+/* Paper & Ink: same as the default, but with a deep indigo dark mode instead of
+   near-black. Applies when <html data-preset="paper">. */
+:root[data-preset='paper'][data-theme='dark'] {
+  --bg: #16142b;
+  --bg-soft: #1b1934;
+  --surface: #211e3d;
+  --border: #35315a;
+  --border-strong: #4a4578;
+  --text: #ece6d6;
+  --text-muted: #b3ab96;
+  --accent: #a5b4fc;
+  --accent-strong: #c7d2fe;
+  --accent-soft: #2a2752;
+  --accent-contrast: #16142b;
+  --highlight: #f0b27a;
+  --glow: rgba(165, 180, 252, 0.12);
+  --header-bg: rgba(22, 20, 43, 0.85);
+  --grain-opacity: 0.03;
+}

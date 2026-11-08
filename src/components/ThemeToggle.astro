@@ -1,0 +1,89 @@
+---
+/* Cycles System -> Light -> Dark. "System" follows prefers-color-scheme live. */
+---
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Colour theme: system">
+  <svg class="i-system" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg>
+  <svg class="i-light" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+  <svg class="i-dark" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+  <span class="label" aria-hidden="true">System</span>
+</button>
+
+<script>
+  type Mode = 'system' | 'light' | 'dark';
+  const order: Mode[] = ['system', 'light', 'dark'];
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const stored = (): Mode => {
+    const v = localStorage.getItem('theme');
+    return v === 'light' || v === 'dark' ? v : 'system';
+  };
+
+  const apply = (mode: Mode) => {
+    const dark = mode === 'dark' || (mode === 'system' && media.matches);
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+      btn.dataset.mode = mode;
+      const name = mode[0].toUpperCase() + mode.slice(1);
+      btn.setAttribute('aria-label', `Colour theme: ${name}. Click to change.`);
+      const label = btn.querySelector('.label');
+      if (label) label.textContent = name;
+    }
+  };
+
+  apply(stored());
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    btn.addEventListener('click', () => {
+      const next = order[(order.indexOf(stored()) + 1) % order.length];
+      if (next === 'system') localStorage.removeItem('theme');
+      else localStorage.setItem('theme', next);
+      apply(next);
+    });
+  }
+
+  media.addEventListener('change', () => {
+    if (stored() === 'system') apply('system');
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 2.25rem;
+    padding: 0 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-muted);
+    font: 500 0.8rem var(--font-sans);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: none;
+  }
+  .theme-toggle:not([data-mode]) .i-system,
+  .theme-toggle[data-mode='system'] .i-system,
+  .theme-toggle[data-mode='light'] .i-light,
+  .theme-toggle[data-mode='dark'] .i-dark {
+    display: block;
+  }
+  @media (max-width: 40rem) {
+    .label {
+      display: none;
+    }
+  }
+</style>
