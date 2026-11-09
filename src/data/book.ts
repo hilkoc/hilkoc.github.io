@@ -2,7 +2,7 @@
    `published: true`. The download links use GitHub's `releases/latest/download/` URLs,
    so every new release shows up here without rebuilding this site. */
 
-const REPO = 'hilkoc/algebraic-geometry-book';
+const REPO = 'hilkoc/markdown-math-book';
 
 export const BOOK = {
   published: false,
@@ -14,7 +14,7 @@ export const BOOK = {
   releasesApi: `https://api.github.com/repos/${REPO}/releases/latest`,
   pdf: `https://github.com/${REPO}/releases/latest/download/book.pdf`,
   epub: `https://github.com/${REPO}/releases/latest/download/book.epub`,
-  html: 'https://hilkoc.github.io/algebraic-geometry-book/',
+  html: 'https://hilkoc.github.io/markdown-math-book/',
   /* Suggested donation: €1 per chapter. Set below from CHAPTER_COUNT. */
   suggestedEuro: 0,
   url: 'https://hilkoc.github.io/book/',
