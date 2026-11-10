@@ -5,7 +5,7 @@
 const REPO = 'hilkoc/markdown-math-book';
 
 export const BOOK = {
-  published: false,
+  published: true,
   title: 'From Pythagoras to Riemann–Roch',
   subtitle: 'Algebraic Curves Through Problems',
   author: 'Hilko',
